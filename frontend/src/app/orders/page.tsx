@@ -59,7 +59,7 @@ export default function OrdersPage() {
                                     </p>
                                 </div>
                                 <p style={{ fontSize: 18, fontWeight: 700, color: colors.neutral[900], margin: 0 }}>
-                                    ${order.totalAmount.toFixed(2)}
+                                    ৳{order.totalAmount.toFixed(2)}
                                 </p>
                             </div>
 
@@ -80,7 +80,7 @@ export default function OrdersPage() {
                                             {typeof item.product === 'object' ? item.product.name : 'Product'} × {item.quantity}
                                         </span>
                                         <span style={{ fontWeight: 600 }}>
-                                            ${(item.price * item.quantity).toFixed(2)}
+                                            ৳{(item.price * item.quantity).toFixed(2)}
                                         </span>
                                     </div>
                                 ))}

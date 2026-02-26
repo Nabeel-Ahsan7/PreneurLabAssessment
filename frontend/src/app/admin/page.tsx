@@ -28,7 +28,7 @@ export default function AdminDashboard() {
             {/* Stats cards */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 32 }}>
                 <StatCard label="Total Orders" value={report?.totalOrders ?? 0} icon="📦" />
-                <StatCard label="Total Revenue" value={`$${(report?.totalRevenue ?? 0).toFixed(2)}`} icon="💰" />
+                <StatCard label="Total Revenue" value={`৳${(report?.totalRevenue ?? 0).toFixed(2)}`} icon="💰" />
                 <StatCard label="Top Products" value={report?.topProducts?.length ?? 0} icon="⭐" />
             </div>
 
@@ -59,7 +59,7 @@ export default function AdminDashboard() {
                                     <tr key={p.productId} style={{ borderTop: `1px solid ${colors.neutral[100]}` }}>
                                         <td style={tdStyle}>{p.name}</td>
                                         <td style={tdStyle}>{p.totalSold}</td>
-                                        <td style={tdStyle}>${p.totalRevenue.toFixed(2)}</td>
+                                        <td style={tdStyle}>৳{p.totalRevenue.toFixed(2)}</td>
                                     </tr>
                                 ))}
                             </tbody>

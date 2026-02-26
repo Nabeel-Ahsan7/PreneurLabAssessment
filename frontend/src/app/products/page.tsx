@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/auth';
 import { useToast } from '@/components/ui/Toast';
 import ProductCard from '@/components/products/ProductCard';
 import { PageLoading, EmptyState } from '@/components/ui/Loading';
+import AddedToCartModal from '@/components/ui/AddedToCartModal';
 import Button from '@/components/ui/Button';
 import { colors, radii } from '@/lib/tokens';
 import type { Product, Category, PaginationInfo } from '@/types';
@@ -28,6 +29,8 @@ function ProductsContent() {
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [pagination, setPagination] = useState<PaginationInfo | null>(null);
+    const [showAddedModal, setShowAddedModal] = useState(false);
+    const [addedProductName, setAddedProductName] = useState('');
     const [loading, setLoading] = useState(true);
     const [addingId, setAddingId] = useState<string | null>(null);
 
@@ -78,7 +81,9 @@ function ProductsContent() {
         setAddingId(productId);
         try {
             await api('/cart', { method: 'POST', body: JSON.stringify({ productId, quantity: 1 }) });
-            toast('Added to cart!', 'success');
+            const product = products.find(p => p._id === productId);
+            setAddedProductName(product?.name || '');
+            setShowAddedModal(true);
         } catch (err: any) {
             toast(err.message || 'Failed to add to cart', 'error');
         } finally {
@@ -88,6 +93,11 @@ function ProductsContent() {
 
     return (
         <div>
+            <AddedToCartModal
+                open={showAddedModal}
+                onClose={() => setShowAddedModal(false)}
+                productName={addedProductName}
+            />
             <h1 style={{ fontSize: 28, fontWeight: 700, color: colors.neutral[900], marginBottom: 24 }}>
                 Products
             </h1>

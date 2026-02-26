@@ -6,6 +6,7 @@ import { api, API_BASE } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { useToast } from '@/components/ui/Toast';
 import Button from '@/components/ui/Button';
+import AddedToCartModal from '@/components/ui/AddedToCartModal';
 import { PageLoading } from '@/components/ui/Loading';
 import { colors, radii, shadows } from '@/lib/tokens';
 import type { Product } from '@/types';
@@ -20,6 +21,7 @@ export default function ProductDetailPage() {
     const [addingToCart, setAddingToCart] = useState(false);
     const [quantity, setQuantity] = useState(1);
     const [selectedImg, setSelectedImg] = useState(0);
+    const [showAddedModal, setShowAddedModal] = useState(false);
 
     useEffect(() => {
         api<Product>(`/products/${id}`, { skipAuth: true })
@@ -33,7 +35,7 @@ export default function ProductDetailPage() {
         setAddingToCart(true);
         try {
             await api('/cart', { method: 'POST', body: JSON.stringify({ productId: id, quantity }) });
-            toast('Added to cart!', 'success');
+            setShowAddedModal(true);
         } catch (err: any) {
             toast(err.message || 'Failed to add to cart', 'error');
         } finally {
@@ -50,6 +52,11 @@ export default function ProductDetailPage() {
 
     return (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, maxWidth: 960, margin: '0 auto' }}>
+            <AddedToCartModal
+                open={showAddedModal}
+                onClose={() => setShowAddedModal(false)}
+                productName={product?.name}
+            />
             {/* Image section */}
             <div>
                 <div
@@ -122,7 +129,7 @@ export default function ProductDetailPage() {
                 )}
 
                 <p style={{ fontSize: 32, fontWeight: 800, color: colors.neutral[900], margin: 0 }}>
-                    ${product.price.toFixed(2)}
+                    ৳{product.price.toFixed(2)}
                 </p>
 
                 {/* Stock status */}

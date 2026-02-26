@@ -120,7 +120,7 @@ export default function CartPage() {
                                             {item.product.name}
                                         </p>
                                         <p style={{ fontSize: 13, color: colors.neutral[500], margin: '4px 0 0' }}>
-                                            ${item.product.price.toFixed(2)} × {item.quantity}
+                                            ৳{item.product.price.toFixed(2)} × {item.quantity}
                                         </p>
                                     </div>
 
@@ -162,7 +162,7 @@ export default function CartPage() {
                                 {items.length} item{items.length !== 1 ? 's' : ''}
                             </p>
                             <p style={{ fontSize: 24, fontWeight: 800, color: colors.neutral[900], margin: '4px 0 0' }}>
-                                ${total.toFixed(2)}
+                                ৳{total.toFixed(2)}
                             </p>
                         </div>
                         <Button size="lg" loading={placingOrder} onClick={placeOrder}>

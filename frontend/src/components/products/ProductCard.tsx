@@ -107,7 +107,7 @@ export default function ProductCard({ product, onAddToCart, addingToCart }: Prod
                 {/* Price + stock */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
                     <span style={{ fontSize: 18, fontWeight: 700, color: colors.neutral[900] }}>
-                        ${product.price.toFixed(2)}
+                        ৳{product.price.toFixed(2)}
                     </span>
                     {product.stock <= 5 && product.stock > 0 && (
                         <span style={{ fontSize: 11, color: colors.warning, fontWeight: 600 }}>

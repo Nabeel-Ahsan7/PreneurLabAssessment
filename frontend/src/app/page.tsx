@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/auth';
 import { useToast } from '@/components/ui/Toast';
 import ProductCard from '@/components/products/ProductCard';
 import { PageLoading } from '@/components/ui/Loading';
+import AddedToCartModal from '@/components/ui/AddedToCartModal';
 import { colors } from '@/lib/tokens';
 import type { Product, Recommendation } from '@/types';
 
@@ -18,6 +19,8 @@ export default function HomePage() {
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [loading, setLoading] = useState(true);
   const [addingId, setAddingId] = useState<string | null>(null);
+  const [showAddedModal, setShowAddedModal] = useState(false);
+  const [addedProductName, setAddedProductName] = useState('');
 
   useEffect(() => {
     const load = async () => {
@@ -45,7 +48,9 @@ export default function HomePage() {
     setAddingId(productId);
     try {
       await api('/cart', { method: 'POST', body: JSON.stringify({ productId, quantity: 1 }) });
-      toast('Added to cart!', 'success');
+      const product = [...featured, ...recommendations].find(p => p._id === productId);
+      setAddedProductName(product?.name || '');
+      setShowAddedModal(true);
     } catch (err: any) {
       toast(err.message || 'Failed to add to cart', 'error');
     } finally {
@@ -57,6 +62,11 @@ export default function HomePage() {
 
   return (
     <div>
+      <AddedToCartModal
+        open={showAddedModal}
+        onClose={() => setShowAddedModal(false)}
+        productName={addedProductName}
+      />
       <section style={{ textAlign: 'center', padding: '48px 0 40px' }}>
         <h1 style={{ fontSize: 36, fontWeight: 800, color: colors.neutral[900], marginBottom: 12 }}>
           Welcome to NabeelShop
@@ -99,8 +109,8 @@ export default function HomePage() {
             Recommended for You
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 20 }}>
-            {recommendations.slice(0, 4).map((p) => (
-              <ProductCard key={p._id} product={p} onAddToCart={handleAddToCart} addingToCart={addingId === p._id} />
+            {recommendations.slice(0, 4).map((rec) => (
+              <ProductCard key={rec._id} product={rec} onAddToCart={handleAddToCart} addingToCart={addingId === rec._id} />
             ))}
           </div>
         </section>
