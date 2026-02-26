@@ -1,12 +1,22 @@
-FROM node:18-alpine
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci
 
 COPY . .
 RUN npm run build
+
+# Production image
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+COPY --from=builder /app/dist ./dist
 
 RUN mkdir -p /app/uploads
 
