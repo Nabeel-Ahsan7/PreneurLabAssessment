@@ -2,7 +2,7 @@ import request from 'supertest';
 import app from '../app';
 import { connectTestDB, closeTestDB, clearTestDB } from './setup';
 
-beforeAll(async () => await connectTestDB());
+beforeAll(async () => await connectTestDB(), 30000);
 afterEach(async () => await clearTestDB());
 afterAll(async () => await closeTestDB());
 
