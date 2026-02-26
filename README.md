@@ -36,7 +36,7 @@ A production-ready simplified e-commerce system built with Express.js + TypeScri
 ## Project Structure
 
 ```
-Preneur-Lab/
+PreneurLabAssessment/
 ├── backend/
 │   ├── src/
 │   │   ├── config/          # Environment config & DB connection
@@ -82,8 +82,8 @@ This is the easiest way to get the full stack running. Docker Compose will start
 ### 1. Clone the repository
 
 ```bash
-git clone <repo-url>
-cd Preneur-Lab
+git clone https://github.com/Nabeel-Ahsan7/PreneurLabAssessment.git
+cd PreneurLabAssessment
 ```
 
 ### 2. Build and start all services
