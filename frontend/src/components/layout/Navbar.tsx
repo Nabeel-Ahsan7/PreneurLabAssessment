@@ -1,42 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
-import { api } from '@/lib/api';
 import { colors, shadows, radii } from '@/lib/tokens';
-import type { Category } from '@/types';
 
 export default function Navbar() {
     const { user, logout, isAdmin } = useAuth();
-    const router = useRouter();
-    const [search, setSearch] = useState('');
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [showCategories, setShowCategories] = useState(false);
     const [showProfile, setShowProfile] = useState(false);
-    const searchTimeout = useRef<NodeJS.Timeout | null>(null);
-
-    useEffect(() => {
-        api<Category[]>('/categories', { skipAuth: true }).then(setCategories).catch(() => { });
-    }, []);
-
-    const handleSearch = (value: string) => {
-        setSearch(value);
-        if (searchTimeout.current) clearTimeout(searchTimeout.current);
-        searchTimeout.current = setTimeout(() => {
-            if (value.trim()) {
-                router.push(`/products?search=${encodeURIComponent(value.trim())}`);
-            }
-        }, 500);
-    };
-
-    const handleSearchSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (search.trim()) {
-            router.push(`/products?search=${encodeURIComponent(search.trim())}`);
-        }
-    };
 
     return (
         <nav
@@ -62,89 +33,11 @@ export default function Navbar() {
             >
                 {/* Logo */}
                 <Link href="/" style={{ textDecoration: 'none', fontWeight: 700, fontSize: 20, color: colors.primary[500], flexShrink: 0 }}>
-                    PreneurShop
+                    NabeelShop
                 </Link>
 
-                {/* Categories dropdown */}
-                <div style={{ position: 'relative', flexShrink: 0 }}>
-                    <button
-                        onClick={() => setShowCategories(!showCategories)}
-                        style={{
-                            background: 'transparent',
-                            border: 'none',
-                            fontSize: 14,
-                            fontWeight: 500,
-                            color: colors.neutral[700],
-                            cursor: 'pointer',
-                            padding: '8px 12px',
-                            borderRadius: radii.button,
-                            fontFamily: 'inherit',
-                        }}
-                    >
-                        Categories ▾
-                    </button>
-                    {showCategories && (
-                        <div
-                            style={{
-                                position: 'absolute',
-                                top: '100%',
-                                left: 0,
-                                background: '#fff',
-                                border: `1px solid ${colors.neutral[200]}`,
-                                borderRadius: radii.card,
-                                boxShadow: shadows.hover,
-                                minWidth: 180,
-                                padding: 8,
-                                zIndex: 10,
-                            }}
-                        >
-                            {categories.map((cat) => (
-                                <Link
-                                    key={cat._id}
-                                    href={`/products?category=${cat._id}`}
-                                    onClick={() => setShowCategories(false)}
-                                    style={{
-                                        display: 'block',
-                                        padding: '8px 12px',
-                                        color: colors.neutral[700],
-                                        textDecoration: 'none',
-                                        fontSize: 14,
-                                        borderRadius: 6,
-                                    }}
-                                    onMouseEnter={(e) => { e.currentTarget.style.background = colors.neutral[100]; }}
-                                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-                                >
-                                    {cat.name}
-                                </Link>
-                            ))}
-                            {categories.length === 0 && (
-                                <p style={{ padding: '8px 12px', color: colors.neutral[400], fontSize: 13, margin: 0 }}>No categories</p>
-                            )}
-                        </div>
-                    )}
-                </div>
-
-                {/* Search bar */}
-                <form onSubmit={handleSearchSubmit} style={{ flex: 1, maxWidth: 480 }}>
-                    <input
-                        type="text"
-                        placeholder="Search products..."
-                        value={search}
-                        onChange={(e) => handleSearch(e.target.value)}
-                        aria-label="Search products"
-                        style={{
-                            width: '100%',
-                            padding: '9px 16px',
-                            borderRadius: radii.input,
-                            border: `1px solid ${colors.neutral[300]}`,
-                            fontSize: 14,
-                            outline: 'none',
-                            fontFamily: 'inherit',
-                        }}
-                        onFocus={(e) => { e.target.style.borderColor = colors.primary[500]; }}
-                        onBlur={(e) => { e.target.style.borderColor = colors.neutral[300]; }}
-                    />
-                </form>
+                {/* Spacer */}
+                <div style={{ flex: 1 }} />
 
                 {/* Right side */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexShrink: 0 }}>

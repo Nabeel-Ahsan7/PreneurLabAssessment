@@ -64,7 +64,7 @@ export default function RegisterPage() {
                     Create Account
                 </h1>
                 <p style={{ fontSize: 14, color: colors.neutral[500], marginBottom: 28, textAlign: 'center' }}>
-                    Join PreneurShop today
+                    Join NabeelShop today
                 </p>
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>

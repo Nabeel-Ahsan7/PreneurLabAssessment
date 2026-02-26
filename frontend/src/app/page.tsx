@@ -59,7 +59,7 @@ export default function HomePage() {
     <div>
       <section style={{ textAlign: 'center', padding: '48px 0 40px' }}>
         <h1 style={{ fontSize: 36, fontWeight: 800, color: colors.neutral[900], marginBottom: 12 }}>
-          Welcome to PreneurShop
+          Welcome to NabeelShop
         </h1>
         <p style={{ fontSize: 16, color: colors.neutral[500], maxWidth: 520, margin: '0 auto 24px' }}>
           Discover quality products at great prices. Shop with confidence.

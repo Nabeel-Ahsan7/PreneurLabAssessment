@@ -14,7 +14,7 @@ export default function Footer() {
         >
             <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 24px' }}>
                 <p style={{ fontSize: 13, color: colors.neutral[400], margin: 0 }}>
-                    © {new Date().getFullYear()} PreneurShop. All rights reserved.
+                    © {new Date().getFullYear()} NabeelShop. All rights reserved.
                 </p>
             </div>
         </footer>
