@@ -53,7 +53,7 @@ export default function AdminReportsPage() {
                 >
                     <p style={{ fontSize: 13, color: colors.neutral[500], margin: 0 }}>Total Revenue</p>
                     <p style={{ fontSize: 36, fontWeight: 800, color: colors.success, margin: '8px 0 0' }}>
-                        ${report.totalRevenue.toFixed(2)}
+                        ৳{report.totalRevenue.toFixed(2)}
                     </p>
                 </div>
             </div>
@@ -103,7 +103,7 @@ export default function AdminReportsPage() {
                                     </td>
                                     <td style={{ ...tdStyle, fontWeight: 600 }}>{p.name}</td>
                                     <td style={tdStyle}>{p.totalSold}</td>
-                                    <td style={{ ...tdStyle, fontWeight: 600, color: colors.success }}>${p.totalRevenue.toFixed(2)}</td>
+                                    <td style={{ ...tdStyle, fontWeight: 600, color: colors.success }}>৳{p.totalRevenue.toFixed(2)}</td>
                                 </tr>
                             ))}
                         </tbody>

@@ -1,4 +1,6 @@
 import { Request, Response } from 'express';
+import fs from 'fs';
+import path from 'path';
 import Product from '../models/Product';
 import SearchHistory from '../models/SearchHistory';
 import { AuthRequest } from '../types';
@@ -110,7 +112,7 @@ export const getProductById = async (req: Request, res: Response): Promise<void>
 /** PUT /products/:id — Admin only */
 export const updateProduct = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { name, price, stock, description, categories } = req.body;
+        const { name, price, stock, description, categories, existingImages } = req.body;
 
         const updateData: any = {};
         if (name !== undefined) updateData.name = name;
@@ -121,23 +123,50 @@ export const updateProduct = async (req: Request, res: Response): Promise<void> 
             updateData.categories = typeof categories === 'string' ? JSON.parse(categories) : categories;
         }
 
-        // If new images uploaded, add them
+        // Handle images
+        const existingProduct = await Product.findById(req.params.id);
+        if (!existingProduct) {
+            res.status(404).json({ message: 'Product not found.' });
+            return;
+        }
+
+        let finalImages: string[] = [];
+
+        // Parse existing images that weren't deleted
+        if (existingImages) {
+            const parsedExisting = typeof existingImages === 'string' ? JSON.parse(existingImages) : existingImages;
+            finalImages = [...parsedExisting];
+
+            // Delete images that were removed
+            const removedImages = existingProduct.images.filter(img => !parsedExisting.includes(img));
+            removedImages.forEach((imagePath) => {
+                const filePath = path.join(__dirname, '../../', imagePath);
+                if (fs.existsSync(filePath)) {
+                    try {
+                        fs.unlinkSync(filePath);
+                    } catch (err) {
+                        console.error(`Failed to delete image: ${filePath}`, err);
+                    }
+                }
+            });
+        }
+
+        // Add new uploaded images
         if (req.files && (req.files as Express.Multer.File[]).length > 0) {
             const newImages = (req.files as Express.Multer.File[]).map(
                 (file) => `/uploads/${file.filename}`
             );
-            updateData.images = newImages;
+            finalImages = [...finalImages, ...newImages];
+        }
+
+        if (finalImages.length > 0) {
+            updateData.images = finalImages;
         }
 
         const product = await Product.findByIdAndUpdate(req.params.id, updateData, {
             new: true,
             runValidators: true,
         }).populate('categories', 'name slug');
-
-        if (!product) {
-            res.status(404).json({ message: 'Product not found.' });
-            return;
-        }
 
         res.json(product);
     } catch (error: any) {
@@ -153,6 +182,21 @@ export const deleteProduct = async (req: Request, res: Response): Promise<void> 
             res.status(404).json({ message: 'Product not found.' });
             return;
         }
+
+        // Delete associated image files
+        if (product.images && product.images.length > 0) {
+            product.images.forEach((imagePath) => {
+                const filePath = path.join(__dirname, '../../', imagePath);
+                if (fs.existsSync(filePath)) {
+                    try {
+                        fs.unlinkSync(filePath);
+                    } catch (err) {
+                        console.error(`Failed to delete image: ${filePath}`, err);
+                    }
+                }
+            });
+        }
+
         res.json({ message: 'Product deleted.' });
     } catch (error: any) {
         res.status(500).json({ message: 'Server error.', error: error.message });

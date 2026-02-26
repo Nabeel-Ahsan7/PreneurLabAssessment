@@ -15,7 +15,7 @@ export default function AdminProductsPage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
-    const [showForm, setShowForm] = useState(false);
+    const [showModal, setShowModal] = useState(false);
     const [editing, setEditing] = useState<Product | null>(null);
     const [deleteTarget, setDeleteTarget] = useState<Product | null>(null);
 
@@ -25,7 +25,8 @@ export default function AdminProductsPage() {
     const [stock, setStock] = useState('');
     const [description, setDescription] = useState('');
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-    const [images, setImages] = useState<FileList | null>(null);
+    const [existingImages, setExistingImages] = useState<string[]>([]);
+    const [newImageFiles, setNewImageFiles] = useState<File[]>([]);
     const [saving, setSaving] = useState(false);
 
     const fetchProducts = async () => {
@@ -49,10 +50,10 @@ export default function AdminProductsPage() {
         setPrice('');
         setStock('');
         setDescription('');
-        setSelectedCategories([]);
-        setImages(null);
+        setExistingImages([]);
+        setNewImageFiles([]);
         setEditing(null);
-        setShowForm(false);
+        setShowModal(false);
     };
 
     const openEdit = (product: Product) => {
@@ -62,13 +63,36 @@ export default function AdminProductsPage() {
         setStock(String(product.stock));
         setDescription(product.description);
         setSelectedCategories(product.categories.map((c) => c._id));
-        setShowForm(true);
+        setExistingImages(product.images || []);
+        setNewImageFiles([]);
+        setShowModal(true);
+    };
+
+    const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            const filesArray = Array.from(e.target.files);
+            setNewImageFiles([...newImageFiles, ...filesArray]);
+            e.target.value = ''; // Reset input to allow selecting same file again
+        }
+    };
+
+    const removeExistingImage = (index: number) => {
+        setExistingImages(existingImages.filter((_, i) => i !== index));
+    };
+
+    const removeNewImage = (index: number) => {
+        setNewImageFiles(newImageFiles.filter((_, i) => i !== index));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!name || !price || !stock || !description) {
             toast('All fields are required', 'warning');
+            return;
+        }
+
+        if (existingImages.length === 0 && newImageFiles.length === 0) {
+            toast('Please add at least one image', 'warning');
             return;
         }
 
@@ -79,9 +103,14 @@ export default function AdminProductsPage() {
         formData.append('stock', stock);
         formData.append('description', description);
         formData.append('categories', JSON.stringify(selectedCategories));
-        if (images) {
-            Array.from(images).forEach((file) => formData.append('images', file));
+
+        // For editing: send existing images that weren't deleted
+        if (editing) {
+            formData.append('existingImages', JSON.stringify(existingImages));
         }
+
+        // Add new image files
+        newImageFiles.forEach((file) => formData.append('images', file));
 
         try {
             if (editing) {
@@ -118,94 +147,270 @@ export default function AdminProductsPage() {
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
                 <h1 style={{ fontSize: 24, fontWeight: 700, color: colors.neutral[900], margin: 0 }}>Products</h1>
-                <Button onClick={() => { resetForm(); setShowForm(true); }}>+ Add Product</Button>
+                <Button onClick={() => { resetForm(); setShowModal(true); }}>+ Add Product</Button>
             </div>
 
-            {/* Form */}
-            {showForm && (
+            {/* Product Form Modal */}
+            {showModal && (
                 <div
                     style={{
-                        padding: 24,
-                        background: '#fff',
-                        border: `1px solid ${colors.neutral[200]}`,
-                        borderRadius: radii.card,
-                        boxShadow: shadows.soft,
-                        marginBottom: 24,
+                        position: 'fixed',
+                        inset: 0,
+                        zIndex: 9000,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'rgba(0,0,0,0.5)',
+                        overflow: 'auto',
+                        padding: '20px',
                     }}
+                    onClick={resetForm}
                 >
-                    <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: colors.neutral[800] }}>
-                        {editing ? 'Edit Product' : 'New Product'}
-                    </h2>
-                    <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                        <Input label="Name" value={name} onChange={(e) => setName(e.target.value)} />
-                        <Input label="Price" type="number" step="0.01" value={price} onChange={(e) => setPrice(e.target.value)} />
-                        <Input label="Stock" type="number" value={stock} onChange={(e) => setStock(e.target.value)} />
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                            <label style={{ fontSize: 14, fontWeight: 500, color: colors.neutral[700] }}>Images</label>
-                            <input
-                                type="file"
-                                multiple
-                                accept="image/*"
-                                onChange={(e) => setImages(e.target.files)}
-                                style={{ fontSize: 14 }}
-                            />
-                        </div>
-                        <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                            <label style={{ fontSize: 14, fontWeight: 500, color: colors.neutral[700] }}>Description</label>
-                            <textarea
-                                value={description}
-                                onChange={(e) => setDescription(e.target.value)}
-                                rows={3}
-                                style={{
-                                    padding: '10px 14px',
-                                    borderRadius: radii.input,
-                                    border: `1px solid ${colors.neutral[300]}`,
-                                    fontSize: 14,
-                                    fontFamily: 'inherit',
-                                    resize: 'vertical',
-                                    outline: 'none',
-                                }}
-                            />
-                        </div>
-                        <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                            <label style={{ fontSize: 14, fontWeight: 500, color: colors.neutral[700] }}>Categories</label>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                                {categories.map((cat) => {
-                                    const selected = selectedCategories.includes(cat._id);
-                                    return (
-                                        <button
-                                            key={cat._id}
-                                            type="button"
-                                            onClick={() => {
-                                                setSelectedCategories(
-                                                    selected
-                                                        ? selectedCategories.filter((id) => id !== cat._id)
-                                                        : [...selectedCategories, cat._id]
-                                                );
-                                            }}
+                    <div
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                            background: '#fff',
+                            borderRadius: radii.card,
+                            boxShadow: shadows.hover,
+                            padding: 32,
+                            maxWidth: 700,
+                            width: '100%',
+                            maxHeight: '90vh',
+                            overflow: 'auto',
+                        }}
+                    >
+                        <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 24, color: colors.neutral[900] }}>
+                            {editing ? 'Edit Product' : 'New Product'}
+                        </h2>
+                        <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                            <Input label="Name" value={name} onChange={(e) => setName(e.target.value)} />
+                            <Input label="Price" type="number" step="0.01" value={price} onChange={(e) => setPrice(e.target.value)} />
+                            <Input label="Stock" type="number" value={stock} onChange={(e) => setStock(e.target.value)} />
+
+                            {/* Image Upload Section */}
+                            <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                                <label style={{ fontSize: 14, fontWeight: 600, color: colors.neutral[900] }}>Product Images</label>
+                                <p style={{ fontSize: 13, color: colors.neutral[500], margin: 0 }}>
+                                    Upload multiple images. First image will be the main product image.
+                                </p>
+
+                                {/* Image Preview Grid */}
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: 12 }}>
+                                    {/* Existing Images */}
+                                    {existingImages.map((img, index) => (
+                                        <div
+                                            key={`existing-${index}`}
                                             style={{
-                                                padding: '6px 14px',
-                                                borderRadius: 20,
-                                                border: `1px solid ${selected ? colors.primary[500] : colors.neutral[300]}`,
-                                                background: selected ? colors.primary[50] : '#fff',
-                                                color: selected ? colors.primary[700] : colors.neutral[600],
-                                                fontSize: 13,
-                                                cursor: 'pointer',
-                                                fontWeight: selected ? 600 : 400,
-                                                fontFamily: 'inherit',
+                                                position: 'relative',
+                                                aspectRatio: '1',
+                                                borderRadius: radii.input,
+                                                overflow: 'hidden',
+                                                border: `2px solid ${colors.neutral[200]}`,
                                             }}
                                         >
-                                            {cat.name}
-                                        </button>
-                                    );
-                                })}
+                                            <img
+                                                src={`${API_BASE}${img}`}
+                                                alt=""
+                                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => removeExistingImage(index)}
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: 4,
+                                                    right: 4,
+                                                    width: 24,
+                                                    height: 24,
+                                                    borderRadius: '50%',
+                                                    background: 'rgba(0,0,0,0.7)',
+                                                    color: '#fff',
+                                                    border: 'none',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    fontSize: 16,
+                                                    fontWeight: 700,
+                                                    fontFamily: 'inherit',
+                                                }}
+                                            >
+                                                ×
+                                            </button>
+                                            {index === 0 && (
+                                                <div
+                                                    style={{
+                                                        position: 'absolute',
+                                                        bottom: 4,
+                                                        left: 4,
+                                                        background: colors.primary[500],
+                                                        color: '#fff',
+                                                        fontSize: 10,
+                                                        fontWeight: 600,
+                                                        padding: '2px 6px',
+                                                        borderRadius: 4,
+                                                    }}
+                                                >
+                                                    Main
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+
+                                    {/* New Image Previews */}
+                                    {newImageFiles.map((file, index) => (
+                                        <div
+                                            key={`new-${index}`}
+                                            style={{
+                                                position: 'relative',
+                                                aspectRatio: '1',
+                                                borderRadius: radii.input,
+                                                overflow: 'hidden',
+                                                border: `2px solid ${colors.primary[300]}`,
+                                            }}
+                                        >
+                                            <img
+                                                src={URL.createObjectURL(file)}
+                                                alt=""
+                                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => removeNewImage(index)}
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: 4,
+                                                    right: 4,
+                                                    width: 24,
+                                                    height: 24,
+                                                    borderRadius: '50%',
+                                                    background: 'rgba(0,0,0,0.7)',
+                                                    color: '#fff',
+                                                    border: 'none',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    fontSize: 16,
+                                                    fontWeight: 700,
+                                                    fontFamily: 'inherit',
+                                                }}
+                                            >
+                                                ×
+                                            </button>
+                                            <div
+                                                style={{
+                                                    position: 'absolute',
+                                                    bottom: 4,
+                                                    left: 4,
+                                                    background: colors.success,
+                                                    color: '#fff',
+                                                    fontSize: 10,
+                                                    fontWeight: 600,
+                                                    padding: '2px 6px',
+                                                    borderRadius: 4,
+                                                }}
+                                            >
+                                                New
+                                            </div>
+                                        </div>
+                                    ))}
+
+                                    {/* Upload Button */}
+                                    <label
+                                        style={{
+                                            aspectRatio: '1',
+                                            borderRadius: radii.input,
+                                            border: `2px dashed ${colors.neutral[300]}`,
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            cursor: 'pointer',
+                                            background: colors.neutral[50],
+                                            transition: 'all 0.2s',
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.borderColor = colors.primary[400];
+                                            e.currentTarget.style.background = colors.primary[50];
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.borderColor = colors.neutral[300];
+                                            e.currentTarget.style.background = colors.neutral[50];
+                                        }}
+                                    >
+                                        <span style={{ fontSize: 32, marginBottom: 4 }}>+</span>
+                                        <span style={{ fontSize: 11, color: colors.neutral[600], textAlign: 'center', padding: '0 8px' }}>
+                                            Add Image
+                                        </span>
+                                        <input
+                                            type="file"
+                                            multiple
+                                            accept="image/*"
+                                            onChange={handleImageSelect}
+                                            style={{ display: 'none' }}
+                                        />
+                                    </label>
+                                </div>
                             </div>
-                        </div>
-                        <div style={{ gridColumn: '1 / -1', display: 'flex', gap: 12 }}>
-                            <Button type="submit" loading={saving}>{editing ? 'Update' : 'Create'}</Button>
-                            <Button variant="secondary" type="button" onClick={resetForm}>Cancel</Button>
-                        </div>
-                    </form>
+
+                            <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                <label style={{ fontSize: 14, fontWeight: 500, color: colors.neutral[700] }}>Description</label>
+                                <textarea
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
+                                    rows={3}
+                                    style={{
+                                        padding: '10px 14px',
+                                        borderRadius: radii.input,
+                                        border: `1px solid ${colors.neutral[300]}`,
+                                        fontSize: 14,
+                                        fontFamily: 'inherit',
+                                        resize: 'vertical',
+                                        outline: 'none',
+                                    }}
+                                />
+                            </div>
+                            <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                <label style={{ fontSize: 14, fontWeight: 500, color: colors.neutral[700] }}>Categories</label>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                                    {categories.map((cat) => {
+                                        const selected = selectedCategories.includes(cat._id);
+                                        return (
+                                            <button
+                                                key={cat._id}
+                                                type="button"
+                                                onClick={() => {
+                                                    setSelectedCategories(
+                                                        selected
+                                                            ? selectedCategories.filter((id) => id !== cat._id)
+                                                            : [...selectedCategories, cat._id]
+                                                    );
+                                                }}
+                                                style={{
+                                                    padding: '6px 14px',
+                                                    borderRadius: 20,
+                                                    border: `1px solid ${selected ? colors.primary[500] : colors.neutral[300]}`,
+                                                    background: selected ? colors.primary[50] : '#fff',
+                                                    color: selected ? colors.primary[700] : colors.neutral[600],
+                                                    fontSize: 13,
+                                                    cursor: 'pointer',
+                                                    fontWeight: selected ? 600 : 400,
+                                                    fontFamily: 'inherit',
+                                                }}
+                                            >
+                                                {cat.name}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                            <div style={{ gridColumn: '1 / -1', display: 'flex', gap: 12 }}>
+                                <Button type="submit" loading={saving}>{editing ? 'Update' : 'Create'}</Button>
+                                <Button variant="secondary" type="button" onClick={resetForm}>Cancel</Button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             )}
 
@@ -245,7 +450,7 @@ export default function AdminProductsPage() {
                                         </div>
                                     </td>
                                     <td style={{ ...tdStyle, fontWeight: 500 }}>{p.name}</td>
-                                    <td style={tdStyle}>${p.price.toFixed(2)}</td>
+                                    <td style={tdStyle}>৳{p.price.toFixed(2)}</td>
                                     <td style={tdStyle}>
                                         <span style={{ color: p.stock <= 5 ? colors.warning : colors.neutral[700] }}>{p.stock}</span>
                                     </td>
