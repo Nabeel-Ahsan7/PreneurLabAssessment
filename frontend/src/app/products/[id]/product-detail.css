@@ -1,0 +1,56 @@
+/* Mobile responsive layout for product detail page */
+@media (max-width: 768px) {
+    .product-detail-container {
+        grid-template-columns: 1fr !important;
+        gap: 24px !important;
+        padding: 0 16px;
+    }
+
+    .product-image-section {
+        order: 1;
+    }
+
+    .product-info-section {
+        order: 2;
+    }
+
+    .product-thumbnails {
+        overflow-x: auto;
+        scrollbar-width: thin;
+    }
+
+    .product-thumbnails::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .product-thumbnails::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .product-thumbnails::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 3px;
+    }
+
+    .add-to-cart-controls {
+        flex-wrap: wrap !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .product-detail-container {
+        padding: 0 12px;
+    }
+
+    h1 {
+        font-size: 22px !important;
+    }
+
+    .add-to-cart-controls {
+        width: 100%;
+    }
+
+    .add-to-cart-controls>button {
+        flex: 1;
+    }
+}

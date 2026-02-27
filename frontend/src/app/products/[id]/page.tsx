@@ -10,6 +10,7 @@ import AddedToCartModal from '@/components/ui/AddedToCartModal';
 import { PageLoading } from '@/components/ui/Loading';
 import { colors, radii, shadows } from '@/lib/tokens';
 import type { Product } from '@/types';
+import './product-detail.css';
 
 export default function ProductDetailPage() {
     const { id } = useParams();
@@ -51,14 +52,14 @@ export default function ProductDetailPage() {
         : null;
 
     return (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, maxWidth: 960, margin: '0 auto' }}>
+        <div className="product-detail-container" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, maxWidth: 960, margin: '0 auto' }}>
             <AddedToCartModal
                 open={showAddedModal}
                 onClose={() => setShowAddedModal(false)}
                 productName={product?.name}
             />
             {/* Image section */}
-            <div>
+            <div className="product-image-section">
                 <div
                     style={{
                         width: '100%',
@@ -79,7 +80,7 @@ export default function ProductDetailPage() {
                     )}
                 </div>
                 {product.images.length > 1 && (
-                    <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                    <div className="product-thumbnails" style={{ display: 'flex', gap: 8, marginTop: 12 }}>
                         {product.images.map((img, i) => (
                             <button
                                 key={i}
@@ -103,7 +104,7 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Info section */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div className="product-info-section" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <h1 style={{ fontSize: 28, fontWeight: 700, color: colors.neutral[900], margin: 0 }}>
                     {product.name}
                 </h1>
@@ -149,7 +150,7 @@ export default function ProductDetailPage() {
 
                 {/* Add to cart */}
                 {product.stock > 0 && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 8 }}>
+                    <div className="add-to-cart-controls" style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 8 }}>
                         <div
                             style={{
                                 display: 'flex',
