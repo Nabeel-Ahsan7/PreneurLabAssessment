@@ -126,7 +126,7 @@ export default function CartPage() {
 
                                     {/* Subtotal */}
                                     <p style={{ fontWeight: 700, fontSize: 16, color: colors.neutral[900], margin: 0, minWidth: 80, textAlign: 'right' }}>
-                                        ${(item.product.price * item.quantity).toFixed(2)}
+                                        ৳{(item.product.price * item.quantity).toFixed(2)}
                                     </p>
 
                                     {/* Remove */}
