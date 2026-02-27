@@ -1,0 +1,35 @@
+/* Mobile responsive layout for categories page */
+@media (max-width: 640px) {
+
+    /* Stack form vertically on mobile */
+    .category-form {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    /* Stack category items vertically on mobile */
+    .category-item {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+    }
+
+    .category-name {
+        width: 100% !important;
+        margin-bottom: 8px;
+    }
+
+    .category-actions {
+        width: 100%;
+        justify-content: flex-start !important;
+    }
+
+    /* Edit mode responsive */
+    .category-edit {
+        width: 100% !important;
+    }
+
+    .category-edit input {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+}

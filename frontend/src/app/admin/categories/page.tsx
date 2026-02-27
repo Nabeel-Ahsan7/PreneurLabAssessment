@@ -9,6 +9,7 @@ import ConfirmModal from '@/components/ui/ConfirmModal';
 import { PageLoading, EmptyState } from '@/components/ui/Loading';
 import { colors, radii, shadows } from '@/lib/tokens';
 import type { Category } from '@/types';
+import './categories.css';
 
 export default function AdminCategoriesPage() {
     const { toast } = useToast();
@@ -84,6 +85,7 @@ export default function AdminCategoriesPage() {
             {/* Create form */}
             <form
                 onSubmit={handleCreate}
+                className="category-form"
                 style={{
                     display: 'flex',
                     gap: 12,
@@ -117,16 +119,19 @@ export default function AdminCategoriesPage() {
                     {categories.map((cat, i) => (
                         <div
                             key={cat._id}
+                            className="category-item"
                             style={{
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'space-between',
                                 padding: '14px 20px',
                                 borderTop: i > 0 ? `1px solid ${colors.neutral[100]}` : 'none',
+                                gap: 12,
+                                flexWrap: 'wrap',
                             }}
                         >
                             {editingId === cat._id ? (
-                                <div style={{ display: 'flex', gap: 8, alignItems: 'center', flex: 1 }}>
+                                <div className="category-edit" style={{ display: 'flex', gap: 8, alignItems: 'center', flex: 1, flexWrap: 'wrap' }}>
                                     <input
                                         value={editName}
                                         onChange={(e) => setEditName(e.target.value)}
@@ -147,11 +152,11 @@ export default function AdminCategoriesPage() {
                                 </div>
                             ) : (
                                 <>
-                                    <div>
+                                    <div className="category-name" style={{ flex: 1, minWidth: 0 }}>
                                         <span style={{ fontWeight: 500, fontSize: 15, color: colors.neutral[800] }}>{cat.name}</span>
                                         <span style={{ fontSize: 12, color: colors.neutral[400], marginLeft: 8 }}>/{cat.slug}</span>
                                     </div>
-                                    <div style={{ display: 'flex', gap: 8 }}>
+                                    <div className="category-actions" style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
                                         <Button
                                             variant="secondary"
                                             size="sm"

@@ -1,0 +1,15 @@
+/* Mobile responsive layout for admin panel */
+@media (max-width: 768px) {
+    .admin-layout {
+        flex-direction: column !important;
+    }
+
+    .admin-sidebar {
+        width: 100% !important;
+        position: static !important;
+    }
+
+    .admin-content {
+        width: 100% !important;
+    }
+}

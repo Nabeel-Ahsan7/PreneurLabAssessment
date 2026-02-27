@@ -9,6 +9,7 @@ import ConfirmModal from '@/components/ui/ConfirmModal';
 import { PageLoading, EmptyState } from '@/components/ui/Loading';
 import { colors, radii, shadows } from '@/lib/tokens';
 import type { Product, Category } from '@/types';
+import './products.css';
 
 export default function AdminProductsPage() {
     const { toast } = useToast();
@@ -145,7 +146,7 @@ export default function AdminProductsPage() {
 
     return (
         <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
                 <h1 style={{ fontSize: 24, fontWeight: 700, color: colors.neutral[900], margin: 0 }}>Products</h1>
                 <Button onClick={() => { resetForm(); setShowModal(true); }}>+ Add Product</Button>
             </div>
@@ -182,7 +183,7 @@ export default function AdminProductsPage() {
                         <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 24, color: colors.neutral[900] }}>
                             {editing ? 'Edit Product' : 'New Product'}
                         </h2>
-                        <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                        <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16 }}>
                             <Input label="Name" value={name} onChange={(e) => setName(e.target.value)} />
                             <Input label="Price" type="number" step="0.01" value={price} onChange={(e) => setPrice(e.target.value)} />
                             <Input label="Stock" type="number" value={stock} onChange={(e) => setStock(e.target.value)} />
@@ -414,60 +415,105 @@ export default function AdminProductsPage() {
                 </div>
             )}
 
-            {/* Products table */}
+            {/* Products list - responsive table/cards */}
             {products.length === 0 ? (
                 <EmptyState message="No products yet. Create your first product!" icon="📦" />
             ) : (
-                <div
-                    style={{
-                        background: '#fff',
-                        border: `1px solid ${colors.neutral[200]}`,
-                        borderRadius: radii.card,
-                        overflow: 'hidden',
-                    }}
-                >
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                        <thead>
-                            <tr style={{ background: colors.neutral[50] }}>
-                                <th style={thStyle}>Image</th>
-                                <th style={thStyle}>Name</th>
-                                <th style={thStyle}>Price</th>
-                                <th style={thStyle}>Stock</th>
-                                <th style={thStyle}>Categories</th>
-                                <th style={{ ...thStyle, textAlign: 'right' }}>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {products.map((p) => (
-                                <tr key={p._id} style={{ borderTop: `1px solid ${colors.neutral[100]}` }}>
-                                    <td style={tdStyle}>
-                                        <div style={{ width: 40, height: 40, borderRadius: 6, background: colors.neutral[100], overflow: 'hidden' }}>
-                                            {p.images?.[0] ? (
-                                                <img src={`${API_BASE}${p.images[0]}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                            ) : (
-                                                <span style={{ fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: colors.neutral[300] }}>📷</span>
-                                            )}
-                                        </div>
-                                    </td>
-                                    <td style={{ ...tdStyle, fontWeight: 500 }}>{p.name}</td>
-                                    <td style={tdStyle}>৳{p.price.toFixed(2)}</td>
-                                    <td style={tdStyle}>
-                                        <span style={{ color: p.stock <= 5 ? colors.warning : colors.neutral[700] }}>{p.stock}</span>
-                                    </td>
-                                    <td style={tdStyle}>
-                                        {p.categories?.map((c) => c.name).join(', ') || '—'}
-                                    </td>
-                                    <td style={{ ...tdStyle, textAlign: 'right' }}>
-                                        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-                                            <Button variant="secondary" size="sm" onClick={() => openEdit(p)}>Edit</Button>
-                                            <Button variant="danger" size="sm" onClick={() => setDeleteTarget(p)}>Delete</Button>
-                                        </div>
-                                    </td>
+                <>
+                    {/* Desktop table - hidden on mobile */}
+                    <div
+                        className="desktop-table"
+                        style={{
+                            background: '#fff',
+                            border: `1px solid ${colors.neutral[200]}`,
+                            borderRadius: radii.card,
+                            overflow: 'hidden',
+                        }}
+                    >
+                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <thead>
+                                <tr style={{ background: colors.neutral[50] }}>
+                                    <th style={thStyle}>Image</th>
+                                    <th style={thStyle}>Name</th>
+                                    <th style={thStyle}>Price</th>
+                                    <th style={thStyle}>Stock</th>
+                                    <th style={thStyle}>Categories</th>
+                                    <th style={{ ...thStyle, textAlign: 'right' }}>Actions</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody>
+                                {products.map((p) => (
+                                    <tr key={p._id} style={{ borderTop: `1px solid ${colors.neutral[100]}` }}>
+                                        <td style={tdStyle}>
+                                            <div style={{ width: 40, height: 40, borderRadius: 6, background: colors.neutral[100], overflow: 'hidden' }}>
+                                                {p.images?.[0] ? (
+                                                    <img src={`${API_BASE}${p.images[0]}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                ) : (
+                                                    <span style={{ fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: colors.neutral[300] }}>📷</span>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td style={{ ...tdStyle, fontWeight: 500 }}>{p.name}</td>
+                                        <td style={tdStyle}>৳{p.price.toFixed(2)}</td>
+                                        <td style={tdStyle}>
+                                            <span style={{ color: p.stock <= 5 ? colors.warning : colors.neutral[700] }}>{p.stock}</span>
+                                        </td>
+                                        <td style={tdStyle}>
+                                            {p.categories?.map((c) => c.name).join(', ') || '—'}
+                                        </td>
+                                        <td style={{ ...tdStyle, textAlign: 'right' }}>
+                                            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                                                <Button variant="secondary" size="sm" onClick={() => openEdit(p)}>Edit</Button>
+                                                <Button variant="danger" size="sm" onClick={() => setDeleteTarget(p)}>Delete</Button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Mobile cards - hidden on desktop */}
+                    <div className="mobile-cards" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                        {products.map((p) => (
+                            <div
+                                key={p._id}
+                                style={{
+                                    background: '#fff',
+                                    border: `1px solid ${colors.neutral[200]}`,
+                                    borderRadius: radii.card,
+                                    padding: 16,
+                                    display: 'flex',
+                                    gap: 12,
+                                }}
+                            >
+                                <div style={{ width: 80, height: 80, borderRadius: 8, background: colors.neutral[100], overflow: 'hidden', flexShrink: 0 }}>
+                                    {p.images?.[0] ? (
+                                        <img src={`${API_BASE}${p.images[0]}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    ) : (
+                                        <span style={{ fontSize: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: colors.neutral[300] }}>📷</span>
+                                    )}
+                                </div>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                    <h3 style={{ fontSize: 16, fontWeight: 600, color: colors.neutral[900], margin: '0 0 8px 0', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</h3>
+                                    <div style={{ display: 'flex', gap: 16, marginBottom: 8, flexWrap: 'wrap' }}>
+                                        <span style={{ fontSize: 14, color: colors.neutral[700] }}>৳{p.price.toFixed(2)}</span>
+                                        <span style={{ fontSize: 14, color: p.stock <= 5 ? colors.warning : colors.neutral[700] }}>Stock: {p.stock}</span>
+                                    </div>
+                                    {p.categories && p.categories.length > 0 && (
+                                        <div style={{ fontSize: 13, color: colors.neutral[500], marginBottom: 12 }}>
+                                            {p.categories.map((c) => c.name).join(', ')}
+                                        </div>
+                                    )}
+                                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                                        <Button variant="secondary" size="sm" onClick={() => openEdit(p)}>Edit</Button>
+                                        <Button variant="danger" size="sm" onClick={() => setDeleteTarget(p)}>Delete</Button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </>
             )}
 
             <ConfirmModal

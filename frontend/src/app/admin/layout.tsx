@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { PageLoading } from '@/components/ui/Loading';
 import { colors, radii, shadows } from '@/lib/tokens';
+import './admin.css';
 
 const navItems = [
     { label: 'Dashboard', href: '/admin', icon: '📊' },
@@ -29,9 +30,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (!isAdmin) return null;
 
     return (
-        <div style={{ display: 'flex', gap: 24, minHeight: '70vh' }}>
+        <div className="admin-layout" style={{ display: 'flex', gap: 24, minHeight: '70vh' }}>
             {/* Sidebar */}
             <aside
+                className="admin-sidebar"
                 style={{
                     width: 220,
                     background: colors.neutral[50],
@@ -78,7 +80,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </nav>
             </aside>
 
-            {/* Content */}
+            {/* CoclassName="admin-content" ntent */}
             <main style={{ flex: 1 }}>
                 {children}
             </main>
