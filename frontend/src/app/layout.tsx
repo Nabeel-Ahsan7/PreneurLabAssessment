@@ -3,7 +3,7 @@ import "./globals.css";
 import ClientProviders from "./providers";
 
 export const metadata: Metadata = {
-  title: "PreneurShop - E-Commerce",
+  title: "Nabeel- E-Commerce",
   description: "Modern e-commerce platform",
 };
 
