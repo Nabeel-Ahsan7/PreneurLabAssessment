@@ -77,7 +77,7 @@ export default function OrdersPage() {
                                         }}
                                     >
                                         <span>
-                                            {typeof item.product === 'object' ? item.product.name : 'Product'} × {item.quantity}
+                                            {typeof item.product === 'object' && item.product ? item.product.name : 'Deleted Product'} × {item.quantity}
                                         </span>
                                         <span style={{ fontWeight: 600 }}>
                                             ৳{(item.price * item.quantity).toFixed(2)}
