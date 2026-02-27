@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { useCart } from '@/lib/cart';
 import { useToast } from '@/components/ui/Toast';
 import ProductCard from '@/components/products/ProductCard';
 import { PageLoading } from '@/components/ui/Loading';
@@ -13,6 +14,7 @@ import type { Product, Recommendation } from '@/types';
 
 export default function HomePage() {
   const { user } = useAuth();
+  const { refreshCart } = useCart();
   const { toast } = useToast();
   const router = useRouter();
   const [featured, setFeatured] = useState<Product[]>([]);
@@ -48,6 +50,7 @@ export default function HomePage() {
     setAddingId(productId);
     try {
       await api('/cart', { method: 'POST', body: JSON.stringify({ productId, quantity: 1 }) });
+      await refreshCart(); // Update cart count immediately
       const product = [...featured, ...recommendations].find(p => p._id === productId);
       setAddedProductName(product?.name || '');
       setShowAddedModal(true);

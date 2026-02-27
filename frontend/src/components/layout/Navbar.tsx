@@ -3,10 +3,12 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
+import { useCart } from '@/lib/cart';
 import { colors, shadows, radii } from '@/lib/tokens';
 
 export default function Navbar() {
     const { user, logout, isAdmin } = useAuth();
+    const { cartCount } = useCart();
     const [showProfile, setShowProfile] = useState(false);
 
     return (
@@ -46,6 +48,7 @@ export default function Navbar() {
                         <Link
                             href="/cart"
                             style={{
+                                position: 'relative',
                                 textDecoration: 'none',
                                 fontSize: 22,
                                 color: colors.neutral[700],
@@ -54,6 +57,29 @@ export default function Navbar() {
                             aria-label="Cart"
                         >
                             🛒
+                            {cartCount > 0 && (
+                                <span
+                                    style={{
+                                        position: 'absolute',
+                                        top: -4,
+                                        right: -4,
+                                        background: colors.error,
+                                        color: '#fff',
+                                        borderRadius: '50%',
+                                        minWidth: 18,
+                                        height: 18,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: 11,
+                                        fontWeight: 700,
+                                        padding: '0 4px',
+                                        border: '2px solid #fff',
+                                    }}
+                                >
+                                    {cartCount > 99 ? '99+' : cartCount}
+                                </span>
+                            )}
                         </Link>
                     )}
 

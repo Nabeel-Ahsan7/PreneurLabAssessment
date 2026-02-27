@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { useCart } from '@/lib/cart';
 import { useToast } from '@/components/ui/Toast';
 import ProductCard from '@/components/products/ProductCard';
 import { PageLoading, EmptyState } from '@/components/ui/Loading';
@@ -22,6 +23,7 @@ export default function ProductsPage() {
 
 function ProductsContent() {
     const { user } = useAuth();
+    const { refreshCart } = useCart();
     const { toast } = useToast();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -81,6 +83,7 @@ function ProductsContent() {
         setAddingId(productId);
         try {
             await api('/cart', { method: 'POST', body: JSON.stringify({ productId, quantity: 1 }) });
+            await refreshCart(); // Update cart count immediately
             const product = products.find(p => p._id === productId);
             setAddedProductName(product?.name || '');
             setShowAddedModal(true);

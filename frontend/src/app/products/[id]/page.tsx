@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { api, API_BASE } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { useCart } from '@/lib/cart';
 import { useToast } from '@/components/ui/Toast';
 import Button from '@/components/ui/Button';
 import AddedToCartModal from '@/components/ui/AddedToCartModal';
@@ -15,6 +16,7 @@ import './product-detail.css';
 export default function ProductDetailPage() {
     const { id } = useParams();
     const { user } = useAuth();
+    const { refreshCart } = useCart();
     const { toast } = useToast();
     const router = useRouter();
     const [product, setProduct] = useState<Product | null>(null);
@@ -35,9 +37,14 @@ export default function ProductDetailPage() {
         if (!user) { router.push('/login'); return; }
         setAddingToCart(true);
         try {
+            console.log('Adding to cart...');
             await api('/cart', { method: 'POST', body: JSON.stringify({ productId: id, quantity }) });
+            console.log('Added to cart, refreshing...');
+            await refreshCart(); // Refresh cart count immediately
+            console.log('Cart refreshed');
             setShowAddedModal(true);
         } catch (err: any) {
+            console.error('Error adding to cart:', err);
             toast(err.message || 'Failed to add to cart', 'error');
         } finally {
             setAddingToCart(false);

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api, API_BASE } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { useCart } from '@/lib/cart';
 import { useToast } from '@/components/ui/Toast';
 import Button from '@/components/ui/Button';
 import { PageLoading, EmptyState } from '@/components/ui/Loading';
@@ -12,6 +13,7 @@ import type { Cart } from '@/types';
 
 export default function CartPage() {
     const { user } = useAuth();
+    const { refreshCart } = useCart();
     const { toast } = useToast();
     const router = useRouter();
     const [cart, setCart] = useState<Cart | null>(null);
@@ -40,6 +42,7 @@ export default function CartPage() {
         try {
             const data = await api<Cart>(`/cart/${productId}`, { method: 'DELETE' });
             setCart(data);
+            await refreshCart(); // Update cart count immediately
             toast('Item removed', 'info');
         } catch (err: any) {
             toast(err.message || 'Failed to remove item', 'error');
@@ -52,6 +55,7 @@ export default function CartPage() {
         setPlacingOrder(true);
         try {
             await api('/orders', { method: 'POST' });
+            await refreshCart(); // Clear cart count after order
             toast('Order placed successfully!', 'success');
             router.push('/orders');
         } catch (err: any) {
